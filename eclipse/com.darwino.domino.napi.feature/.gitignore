@@ -1,0 +1,7 @@
+# In order to generate the right feature.properties and
+# have it included in the final package (since Tycho doesn't
+# cooperate, the build copies into the root of the project.
+# This should not be included in Git
+feature.properties
+!enterprise/feature.properties
+!community/feature.properties

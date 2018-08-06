@@ -1,0 +1,297 @@
+<?xml version="1.0"?>
+<project
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.darwino.domino</groupId>
+	<artifactId>dwo-domino-napi-native</artifactId>
+	<version>2.2.0-SNAPSHOT</version>
+	
+	<packaging>pom</packaging>
+	
+	<name>dwo-domino-napi-native</name>
+	
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<version>1.3</version>
+				<executions>
+					<execution>
+						<id>attach-artifacts</id>
+						<phase>package</phase>
+						<goals>
+							<goal>attach-artifact</goal>
+						</goals>
+						<configuration>
+							<artifacts>
+								<artifact>
+									<file>${project.basedir}/lib/domino-win32-x86.dll</file>
+									<type>dll</type>
+									<classifier>win32-x86</classifier>
+								</artifact>
+								<artifact>
+									<file>${project.basedir}/lib/domino-win32-x64.dll</file>
+									<type>dll</type>
+									<classifier>win32-x64</classifier>
+								</artifact>
+								<artifact>
+									<file>${project.basedir}/lib/libdomino-macosx-x64.dylib</file>
+									<type>dylib</type>
+									<classifier>macosx-x64</classifier>
+								</artifact>
+								<artifact>
+									<file>${project.basedir}/lib/libdomino-linux-x64.so</file>
+									<type>so</type>
+									<classifier>linux-x64</classifier>
+								</artifact>
+								<artifact>
+									<file>${project.basedir}/lib/libdomino-linux-x86.so</file>
+									<type>so</type>
+									<classifier>linux-x86</classifier>
+								</artifact>
+							</artifacts>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+	<distributionManagement>
+		<repository>
+			<id>maven.darwino.com</id>
+			<name>maven.darwino.com-releases</name>
+			<url>https://maven.darwino.com/darwino-enterprise-edition-release</url>
+		</repository>
+	</distributionManagement>
+	
+	<profiles>
+	
+		<!-- 32-bit Windows -->
+		<profile>
+			<id>windows-x86</id>
+		
+			<activation>
+				<os>
+					<family>windows</family>
+					<arch>x86</arch>
+				</os>
+				<property>
+					<name>notes-program</name>
+				</property>
+			</activation>
+			
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>exec-maven-plugin</artifactId>
+						<version>1.4.0</version>
+						<executions>
+							<execution>
+								<id>build-x86</id>
+								<phase>generate-sources</phase>
+								<goals>
+									<goal>exec</goal>
+								</goals>
+								<configuration>
+									<executable>cmd</executable>
+									<arguments>
+										<argument>/c</argument>
+										<argument>build-win32.bat</argument>
+									</arguments>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		
+		<!-- 64-bit Windows (builds both 32-bit and 64-bit) -->
+		<profile>
+			<id>windows-x64</id>
+		
+			<activation>
+				<os>
+					<family>windows</family>
+					<arch>amd64</arch>
+				</os>
+				<property>
+					<name>notes-program</name>
+				</property>
+			</activation>
+			
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>exec-maven-plugin</artifactId>
+						<version>1.4.0</version>
+						<executions>
+							<execution>
+								<id>build-x86</id>
+								<phase>generate-sources</phase>
+								<goals>
+									<goal>exec</goal>
+								</goals>
+								<configuration>
+									<executable>cmd</executable>
+									<arguments>
+										<argument>/c</argument>
+										<argument>build-win32.bat</argument>
+									</arguments>
+								</configuration>
+							</execution>
+							<execution>
+								<id>build-x64</id>
+								<phase>generate-sources</phase>
+								<goals>
+									<goal>exec</goal>
+								</goals>
+								<configuration>
+									<executable>cmd</executable>
+									<arguments>
+										<argument>/c</argument>
+										<argument>build-win64.bat</argument>
+									</arguments>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		
+		<profile>
+			<id>mac</id>
+		
+			<activation>
+				<os>
+					<family>mac</family>
+					<arch>x86_64</arch>
+				</os>
+				<property>
+					<name>notes-program</name>
+				</property>
+			</activation>
+			
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>exec-maven-plugin</artifactId>
+						<version>1.4.0</version>
+						<executions>
+							<execution>
+								<id>build-x64</id>
+								<phase>generate-sources</phase>
+								<goals>
+									<goal>exec</goal>
+								</goals>
+								<configuration>
+									<executable>${project.basedir}/build-macosx64.sh</executable>
+									<environmentVariables>
+										<Notes_ExecDirectory>${notes-program}</Notes_ExecDirectory>
+									</environmentVariables>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		
+		<profile>
+			<id>linux64</id>
+		
+			<activation>
+				<os>
+					<family>unix</family>
+					<name>linux</name>
+					<arch>amd64</arch>
+				</os>
+				<property>
+					<name>notes-program</name>
+				</property>
+			</activation>
+			
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>exec-maven-plugin</artifactId>
+						<version>1.4.0</version>
+						<executions>
+							<execution>
+								<id>build-x64</id>
+								<phase>generate-sources</phase>
+								<goals>
+									<goal>exec</goal>
+								</goals>
+								<configuration>
+									<executable>${project.basedir}/build-linux64.sh</executable>
+									<environmentVariables>
+										<PATH>${notes-program}${path.separator}${notes-program/res/C}${path.separator}${env.PATH}</PATH>
+										<Notes_ExecDirectory>${notes-program}</Notes_ExecDirectory>
+										<LOTUS>${notes-program}</LOTUS>
+										<LD_LIBRARY_PATH>${notes-program}${path.separator}${project.basedir}/dependencies/lib/notes/linux64}${path.separator}${env.LD_LIBRARY_PATH}</LD_LIBRARY_PATH>
+										<DOMINO_RES_DIR>${notes-program}/res/C</DOMINO_RES_DIR>
+									</environmentVariables>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		
+		<profile>
+			<id>linux32</id>
+		
+			<activation>
+				<os>
+					<family>unix</family>
+					<name>linux</name>
+					<arch>i386</arch>
+				</os>
+				<property>
+					<name>notes-program</name>
+				</property>
+			</activation>
+			
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>exec-maven-plugin</artifactId>
+						<version>1.4.0</version>
+						<executions>
+							<execution>
+								<id>build-x86</id>
+								<phase>generate-sources</phase>
+								<goals>
+									<goal>exec</goal>
+								</goals>
+								<configuration>
+									<executable>${project.basedir}/build-linux32.sh</executable>
+									<environmentVariables>
+										<PATH>${notes-program}${path.separator}${env.PATH}</PATH>
+										<Notes_ExecDirectory>${notes-program}</Notes_ExecDirectory>
+										<LOTUS>${notes-program}</LOTUS>
+										<LD_LIBRARY_PATH>${notes-program}${path.separator}${project.basedir}/dependencies/lib/notes/linux64}${path.separator}${env.LD_LIBRARY_PATH}</LD_LIBRARY_PATH>
+										<DOMINO_RES_DIR>${notes-program}/res/C</DOMINO_RES_DIR>
+									</environmentVariables>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+	
+	
+</project>

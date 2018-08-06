@@ -1,0 +1,63 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>com.darwino.domino</groupId>
+		<artifactId>parent-dwo-domino-napi</artifactId>
+		<version>2.2.0-SNAPSHOT</version>
+	</parent>
+	<artifactId>com.darwino.domino.napi.test</artifactId>
+	<packaging>eclipse-test-plugin</packaging>
+
+	<build>
+		<plugins>
+			<!--
+				By default, Tycho doesn't include the other fragment plugins when running the test.
+				So here, we manually include the appropriate features. 
+			 -->
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>target-platform-configuration</artifactId>
+				
+				<configuration>
+					<pomDependencies>consider</pomDependencies>
+					<dependency-resolution>
+						<extraRequirements>
+						
+							<requirement>
+								<type>eclipse-plugin</type>
+								<id>com.ibm.notes.java.api.win32.linux</id>
+								<versionRange>[9.0.1,9.0.2)</versionRange>
+							</requirement>
+							
+							<requirement>
+								<type>eclipse-feature</type>
+								<id>com.darwino.domino.napi.feature</id>
+								<versionRange>0.0.0</versionRange>
+							</requirement>
+							
+						</extraRequirements>
+					</dependency-resolution>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-surefire-plugin</artifactId>
+				
+				<configuration>
+					<testSuite>${project.artifactId}</testSuite>
+					<testClass>com.darwino.domino.napi.test.AllTests</testClass>
+				</configuration>
+			</plugin>
+	
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-deploy-plugin</artifactId>
+				<configuration>
+					<skip>true</skip>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+	
+</project>

@@ -1,0 +1,61 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>com.darwino.domino</groupId>
+    <artifactId>parent-dwo-domino-napi</artifactId>
+    <version>2.2.0-SNAPSHOT</version>
+  </parent>
+  <artifactId>com.darwino.domino.napi.feature</artifactId>
+  <packaging>eclipse-feature</packaging>
+  
+  
+	<properties>
+		<feature.properties.dir>${basedir}/enterprise</feature.properties.dir>
+	</properties>
+  
+  	<build>
+		<plugins>
+
+			<!--
+				Externalize the license text into feature.properties files, then copy into the root dir.
+				https://bugs.eclipse.org/bugs/show_bug.cgi?id=362252 seems to indicate that this can
+				be done without using the root dir, but that doesn't seem to work for features
+			-->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>process-feature.properties</id>
+						<phase>prepare-package</phase>
+						<configuration>
+							<outputDirectory>${project.basedir}</outputDirectory>
+							<overwrite>true</overwrite>
+							<resources>
+								<resource>
+									<directory>${feature.properties.dir}</directory>
+									<includes>
+										<include>feature.properties</include>
+									</includes>
+								</resource>
+							</resources>
+						</configuration>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+	
+	<profiles>
+		<profile>
+			<id>communityedition</id>
+			
+			<properties>
+				<feature.properties.dir>${basedir}/community</feature.properties.dir>
+			</properties>
+		</profile>
+	</profiles>
+</project>

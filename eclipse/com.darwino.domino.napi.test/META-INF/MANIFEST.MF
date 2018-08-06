@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: NAPI Tests
+Bundle-SymbolicName: com.darwino.domino.napi.test
+Automatic-Module-Name: com.darwino.domino.napi.test
+Bundle-Vendor: DARWINO
+Bundle-Version: 2.2.0.qualifier
+Fragment-Host: com.darwino.domino.napi
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Require-Bundle: org.junit;bundle-version="4.0.0"

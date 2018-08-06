@@ -1,0 +1,48 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Darwino Domino NAPI
+Bundle-SymbolicName: com.darwino.domino.napi
+Automatic-Module-Name: com.darwino.domino.napi
+Bundle-Version: 2.2.0.qualifier
+Bundle-Vendor: DARWINO
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Require-Bundle: com.ibm.notes.java.api;resolution:=optional,
+ com.ibm.commons;visibility:=reexport
+Export-Package: com.darwino.domino.napi,
+ com.darwino.domino.napi.c,
+ com.darwino.domino.napi.enums,
+ com.darwino.domino.napi.proc,
+ com.darwino.domino.napi.struct,
+ com.darwino.domino.napi.struct.cd,
+ com.darwino.domino.napi.util,
+ com.darwino.domino.napi.wrap,
+ com.darwino.domino.napi.wrap.design,
+ com.darwino.domino.napi.wrap.io,
+ com.darwino.domino.napi.wrap.item
+Bundle-ClassPath: .
+Import-Package: javax.mail,
+ javax.mail.internet
+Bundle-NativeCode: lib/linux64/libdominonapi.so; processor=x86_64; osname=linux,
+ lib/linux32/libdominonapi.so; processor=x86; osname=linux,
+ lib/mac/libdominonapi.jnilib; processor=x86_64; osname=macosx,
+ lib/win64/dominonapi.dll; processor=x86_64; osname=win32,
+ lib/win32/dominonapi.dll; processor=x86; osname=win32,
+ lib/win32/dominonapi.dll; processor=x86; osname=Windows 7,
+ lib/win64/dominonapi.dll; processor=x86_64; osname=Windows 7,
+ lib/win32/dominonapi.dll; processor=x86; osname=Windows 8,
+ lib/win64/dominonapi.dll; processor=x86_64; osname=Windows 8,
+ lib/win32/dominonapi.dll; processor=x86; osname=Windows 10,
+ lib/win64/dominonapi.dll; processor=x86_64; osname=Windows 10,
+ lib/win32/dominonapi.dll; processor=x86; osname=Windows 2015,
+ lib/win64/dominonapi.dll; processor=x86_64; osname=Windows 2015,
+ lib/win32/dominonapi.dll; processor=x86; osname=Windows 2008,
+ lib/win64/dominonapi.dll; processor=x86_64; osname=Windows 2008,
+ lib/win64/dominonapi.dll; processor=x86_64; osname=Windows Server 2008,
+ lib/win64/dominonapi.dll; processor=x86_64; osname=Windows 2008 R2,
+ lib/win64/dominonapi.dll; processor=x86_64; osname=Windows Server 2008 R2,
+ lib/win64/dominonapi.dll; processor=x86_64; osname=Windows 2012,
+ lib/win64/dominonapi.dll; processor=x86_64; osname=Windows Server 2012,
+ lib/win64/dominonapi.dll; processor=x86_64; osname=Windows 2012 R2,
+ lib/win64/dominonapi.dll; processor=x86_64; osname=Windows Server 2012 R2,
+ lib/win64/dominonapi.dll; processor=x86_64; osname=Windows 2016,
+ lib/win64/dominonapi.dll; processor=x86_64; osname=Windows Server 2016

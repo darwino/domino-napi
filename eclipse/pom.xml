@@ -1,0 +1,523 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.darwino.domino</groupId>
+	<artifactId>parent-dwo-domino-napi</artifactId>
+	<version>2.2.0-SNAPSHOT</version>
+	<packaging>pom</packaging>
+	
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<compiler>1.6</compiler>
+		
+		<tycho-version>1.1.0</tycho-version>
+		<jacoco-version>0.8.1</jacoco-version>
+		
+		<manifest-location>META-INF</manifest-location>
+		<maven.build.timestamp.format>yyyyMMddHHmm</maven.build.timestamp.format>
+		<osgi.qualifier>${maven.build.timestamp}</osgi.qualifier>
+		
+		<!-- This is used below for pointing to the osgi-deps base path. It is re-compiled per-project -->
+		<osgi-deps-path>${project.baseUri}../../osgi-deps</osgi-deps-path>
+		
+		<maven.version>3.2.1</maven.version>
+	</properties>
+	
+	<prerequisites>
+		<maven>${maven.version}</maven>
+	</prerequisites>
+	
+	<modules>
+		<module>com.darwino.domino.napi</module>
+		<module>com.darwino.domino.napi.test</module>
+		<module>com.darwino.domino.napi.feature</module>
+	</modules>
+	
+	<repositories>
+		<repository>
+			<id>notes</id>
+			<layout>p2</layout>
+			<url>${notes-platform}</url>
+		</repository>
+		<repository>
+			<id>local-misc</id>
+			<url>${osgi-deps-path}/Misc/repository</url>
+			<layout>p2</layout>
+		</repository>
+	</repositories>
+	
+	<dependencies>
+		<dependency>
+			<groupId>org.codehaus.plexus</groupId>
+			<artifactId>plexus-utils</artifactId>
+			<version>3.0.15</version>
+		</dependency>
+	</dependencies>
+	
+	<build>
+		<plugins>
+			<plugin>
+				<!-- enable tycho build extension -->
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-maven-plugin</artifactId>
+				<extensions>true</extensions>
+			</plugin>
+			<plugin>
+				<!-- enable tycho packaging extension -->
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-packaging-plugin</artifactId>
+				
+				<configuration>
+					<strictVersions>false</strictVersions>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-compiler-plugin</artifactId>
+				<configuration>
+					<source>${compiler}</source>
+					<target>${compiler}</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-source-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>plugin-source</id>
+						<goals>
+							<goal>plugin-source</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>target-platform-configuration</artifactId>
+				<configuration>
+					<filters>
+						<!-- work around Equinox bug 348045 -->
+						<filter>
+							<type>p2-installable-unit</type>
+							<id>org.eclipse.equinox.servletbridge.extensionbundle</id>
+							<removeAll/>
+						</filter>
+					</filters>
+					<environments>
+						<environment>
+							<os>linux</os>
+							<ws>gtk</ws>
+							<arch>x86</arch>
+						</environment>
+						<environment>
+							<os>linux</os>
+							<ws>gtk</ws>
+							<arch>x86_64</arch>
+						</environment>
+						<environment>
+							<os>win32</os>
+							<ws>win32</ws>
+							<arch>x86</arch>
+						</environment>
+						<environment>
+							<os>win32</os>
+							<ws>win32</ws>
+							<arch>x86_64</arch>
+						</environment>
+						<environment>
+							<os>macosx</os>
+							<ws>cocoa</ws>
+							<arch>x86_64</arch>
+						</environment>
+					</environments>
+					<pomDependencies>consider</pomDependencies>
+					<dependency-resolution>
+						<extraRequirements>
+							<requirement>
+								<type>eclipse-plugin</type>
+								<id>com.ibm.notes.java.api.win32.linux</id>
+								<versionRange>9.0.1</versionRange>
+							</requirement>
+							<requirement>
+								<type>eclipse-plugin</type>
+								<id>com.ibm.designer.lib.jsf</id>
+								<versionRange>9.0.1</versionRange>
+							</requirement>
+							<requirement>
+								<type>eclipse-plugin</type>
+								<id>com.ibm.domino.xsp.bridge.http</id>
+								<versionRange>9.0.1</versionRange>
+							</requirement>
+						</extraRequirements>
+					</dependency-resolution>
+
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.eclipse.tycho.extras</groupId>
+				<artifactId>tycho-p2-extras-plugin</artifactId>
+				<version>${tycho-version}</version>
+				<configuration>
+					<source>
+						<repository>
+							<url>http://download.eclipse.org/releases/neon/</url>
+							<layout>p2</layout>
+						</repository>
+					</source>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-p2-repository-plugin</artifactId>
+				<configuration>
+					<includeAllDependencies>true</includeAllDependencies>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-versions-plugin</artifactId>
+			</plugin>
+			
+			<plugin>
+				<!-- javadoc configuration -->
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<configuration>
+					<failOnError>false</failOnError>
+					<excludePackageNames>com.sun.*:lotus.domino.*:lotus.domino</excludePackageNames>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			
+			<!-- <plugin>
+				<groupId>org.openntf.maven</groupId>
+				<artifactId>nsfodp-maven-plugin</artifactId>
+				<version>1.1.0-SNAPSHOT</version>
+				<extensions>true</extensions>
+			</plugin> -->
+			
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-enforcer-plugin</artifactId>
+				<version>3.0.0-M1</version>
+				<executions>
+					<execution>
+						<id>enforce-maven-and-java</id>
+						<goals>
+							<goal>enforce</goal>
+						</goals>
+						<configuration>
+							<rules>
+								<requireMavenVersion>
+									<version>${maven.version}</version>
+								</requireMavenVersion>
+								<requireJavaVersion>
+									<version>1.6.0</version>
+								</requireJavaVersion>
+							</rules>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+
+
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.felix</groupId>
+					<artifactId>maven-bundle-plugin</artifactId>
+					<version>3.5.0</version>
+					<extensions>true</extensions>
+					
+					<configuration>
+						<manifestLocation>${manifest-location}</manifestLocation>
+						<excludeDependencies>true</excludeDependencies>
+						<supportedProjectTypes>
+							<supportedProjectType>jar</supportedProjectType>
+							<supportedProjectType>bundle</supportedProjectType>
+							<supportedProjectType>eclipse-plugin</supportedProjectType>
+						</supportedProjectTypes>
+						
+						<instructions>
+							<Bundle-RequiredExecutionEnvironment>JavaSE-1.6</Bundle-RequiredExecutionEnvironment>
+							<_removeheaders>Bnd-LastModified,Built-By,Build-Jdk,Created-By,Tool,Include-Resource</_removeheaders>
+						</instructions>
+					</configuration>
+				</plugin>
+				
+				<plugin>
+					<artifactId>maven-jar-plugin</artifactId>
+					<version>3.0.2</version>
+					<configuration>
+						<archive>
+							<manifestFile>${manifest-location}/MANIFEST.MF</manifestFile>
+						</archive>
+					</configuration>
+				</plugin>
+				
+				<plugin>
+					<groupId>org.eclipse.tycho</groupId>
+					<artifactId>tycho-surefire-plugin</artifactId>
+					<version>${tycho-version}</version>
+					
+					<configuration>
+						<encoding>UTF-8</encoding>
+						<inputEncoding>UTF-8</inputEncoding>
+						<outputEncoding>UTF-8</outputEncoding>
+						<argLine>${tycho.testArgLine} -Dfile.encoding=UTF-8</argLine>
+						
+						<!-- This is to enable test execution only on supported platforms below -->
+						<skip>true</skip>
+					</configuration>
+				</plugin>
+				
+				<plugin>
+					<groupId>org.jacoco</groupId>
+					<artifactId>jacoco-maven-plugin</artifactId>
+					<version>${jacoco-version}</version>
+					<configuration>
+						<skip>true</skip>
+					</configuration>
+				</plugin>
+				
+				<plugin>
+					<groupId>org.eclipse.tycho</groupId>
+					<artifactId>tycho-maven-plugin</artifactId>
+					<version>${tycho-version}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.eclipse.tycho</groupId>
+					<artifactId>tycho-compiler-plugin</artifactId>
+					<version>${tycho-version}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.eclipse.tycho</groupId>
+					<artifactId>tycho-source-plugin</artifactId>
+					<version>${tycho-version}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.eclipse.tycho</groupId>
+					<artifactId>tycho-p2-plugin</artifactId>
+					<version>${tycho-version}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.eclipse.tycho</groupId>
+					<artifactId>tycho-packaging-plugin</artifactId>
+					<version>${tycho-version}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.eclipse.tycho</groupId>
+					<artifactId>tycho-versions-plugin</artifactId>
+					<version>${tycho-version}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.eclipse.tycho</groupId>
+					<artifactId>tycho-p2-repository-plugin</artifactId>
+					<version>${tycho-version}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.eclipse.tycho</groupId>
+					<artifactId>tycho-p2-extras-plugin</artifactId>
+					<version>${tycho-version}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.eclipse.tycho</groupId>
+					<artifactId>target-platform-configuration</artifactId>
+					<version>${tycho-version}</version>
+				</plugin>
+				
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-clean-plugin</artifactId>
+					<version>3.0.0</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-deploy-plugin</artifactId>
+					<version>2.8.2</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-install-plugin</artifactId>
+					<version>2.5.2</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-site-plugin</artifactId>
+					<version>3.7</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-javadoc-plugin</artifactId>
+					<version>3.0.0</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-dependency-plugin</artifactId>
+					<version>3.1.0</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-resources-plugin</artifactId>
+					<version>3.0.2</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-assembly-plugin</artifactId>
+					<version>2.5.3</version>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+
+	<!-- These profiles add support for specific platforms for tests -->
+	<profiles>
+		<profile>
+			<id>dist</id>
+			
+			<modules>
+				<module>releng/dwo-dist-domino</module>
+			</modules>
+		</profile>
+	
+		<profile>
+			<activation>
+				<os>
+					<family>Windows</family>
+				</os>
+				<property>
+					<name>notes-program</name>
+				</property>
+			</activation>
+		
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.eclipse.tycho</groupId>
+						<artifactId>tycho-surefire-plugin</artifactId>
+						
+						<configuration>
+							<skip>false</skip>
+							
+							<argLine>${tycho.testArgLine} -Dfile.encoding=UTF-8 -Djava.library.path="${notes-program}"</argLine>
+							<environmentVariables>
+								<PATH>${notes-program}${path.separator}${env.PATH}</PATH>
+							</environmentVariables>
+						</configuration>
+					</plugin>
+				
+					<plugin>
+						<groupId>org.jacoco</groupId>
+						<artifactId>jacoco-maven-plugin</artifactId>
+						<configuration>
+							<skip>false</skip>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		
+		<profile>
+			<id>mac</id>
+			<activation>
+				<os>
+					<family>mac</family>
+				</os>
+				<property>
+					<name>notes-program</name>
+				</property>
+			</activation>
+		
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.eclipse.tycho</groupId>
+						<artifactId>tycho-surefire-plugin</artifactId>
+						
+						<configuration>
+							<skip>false</skip>
+							
+							<argLine>${tycho.testArgLine} -Dfile.encoding=UTF-8 -Djava.library.path="${notes-program}"</argLine>
+							<environmentVariables>
+								<PATH>${notes-program}${path.separator}${env.PATH}</PATH>
+								<LD_LIBRARY_PATH>${notes-program}${path.separator}${env.LD_LIBRARY_PATH}</LD_LIBRARY_PATH>
+								<DYLD_LIBRARY_PATH>${notes-program}${path.separator}${env.DYLD_LIBRARY_PATH}</DYLD_LIBRARY_PATH>
+								<Notes_ExecDirectory>${notes-program}</Notes_ExecDirectory>
+							</environmentVariables>
+						</configuration>
+					</plugin>
+				
+					<plugin>
+						<groupId>org.jacoco</groupId>
+						<artifactId>jacoco-maven-plugin</artifactId>
+						<configuration>
+							<skip>false</skip>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>linux</id>
+			<activation>
+				<os>
+					<family>unix</family>
+					<name>linux</name>
+				</os>
+				<property>
+					<name>notes-program</name>
+				</property>
+			</activation>
+		
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.eclipse.tycho</groupId>
+						<artifactId>tycho-surefire-plugin</artifactId>
+						
+						<configuration>
+							<skip>false</skip>
+							
+							<argLine>${tycho.testArgLine} -Dfile.encoding=UTF-8 -Djava.library.path="${notes-program}"</argLine>
+							<environmentVariables>
+								<!-- The res/C path entry is important for loading formula language properly -->
+								<PATH>${notes-program}${path.separator}${notes-program}/res/C${path.separator}${notes-data}${path.separator}${env.PATH}</PATH>
+								<LD_LIBRARY_PATH>${notes-program}${path.separator}${env.LD_LIBRARY_PATH}</LD_LIBRARY_PATH>
+								
+								<!-- Notes-standard environment variable to specify the program directory -->
+								<Notes_ExecDirectory>${notes-program}</Notes_ExecDirectory>
+								<Directory>${notes-data}</Directory>
+								
+								<!-- Linux generally requires that the notes.ini path be specified manually, since it's difficult to determine automatically -->
+								<!-- This variable is a convention used in the NAPI test classes, not Notes-standard -->
+								<NotesINI>${notes-ini}</NotesINI>
+							</environmentVariables>
+						</configuration>
+					</plugin>
+				
+					<plugin>
+						<groupId>org.jacoco</groupId>
+						<artifactId>jacoco-maven-plugin</artifactId>
+						<configuration>
+							<skip>false</skip>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+</project>
