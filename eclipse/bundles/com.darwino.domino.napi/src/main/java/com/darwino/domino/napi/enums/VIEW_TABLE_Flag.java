@@ -1,16 +1,18 @@
-/*!COPYRIGHT HEADER! - CONFIDENTIAL 
+/**
+ * Copyright © 2014-2018 Darwino, Inc.
  *
- * Darwino Inc Confidential.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * (c) Copyright Darwino Inc. 2014-2018.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * Notice: The information contained in the source code for these files is the property 
- * of Darwino Inc. which, with its licensors, if any, owns all the intellectual property 
- * rights, including all copyright rights thereto.  Such information may only be used 
- * for debugging, troubleshooting and informational purposes.  All other uses of this information, 
- * including any production or commercial uses, are prohibited. 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
-
 package com.darwino.domino.napi.enums;
 
 import com.darwino.domino.napi.DominoAPI;
