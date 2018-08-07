@@ -30,5 +30,15 @@ public class NapiLibrary extends AbstractXspLibrary {
 	public String getLibraryId() {
 		return LIBRARY_ID;
 	}
+	
+	@Override
+	public String getPluginId() {
+		return NapiActivator.instance.getBundle().getSymbolicName();
+	}
+	
+	@Override
+	public boolean isGlobalScope() {
+		return false;
+	}
 
 }

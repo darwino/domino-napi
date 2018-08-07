@@ -6,8 +6,7 @@ Automatic-Module-Name: com.darwino.domino.napi
 Bundle-Version: 2.2.0.qualifier
 Bundle-Vendor: Darwino, Inc.
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Require-Bundle: com.ibm.notes.java.api;resolution:=optional,
- com.ibm.commons;visibility:=reexport
+Require-Bundle: com.ibm.commons;visibility:=reexport
 Export-Package: com.darwino.domino.napi,
  com.darwino.domino.napi.c,
  com.darwino.domino.napi.enums,
@@ -21,7 +20,8 @@ Export-Package: com.darwino.domino.napi,
  com.darwino.domino.napi.wrap.item
 Bundle-ClassPath: .
 Import-Package: javax.mail,
- javax.mail.internet
+ javax.mail.internet,
+ lotus.domino
 Bundle-NativeCode: lib/linux64/libdominonapi.so; processor=x86_64; osname=linux,
  lib/linux32/libdominonapi.so; processor=x86; osname=linux,
  lib/mac/libdominonapi.jnilib; processor=x86_64; osname=macosx,
