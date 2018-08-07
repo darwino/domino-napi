@@ -23,10 +23,11 @@ import java.util.List;
 import com.ibm.commons.log.LogMgr;
 import com.ibm.commons.util.StringUtil;
 import com.darwino.domino.napi.DominoAPI;
+import com.darwino.domino.napi.runtime.Freeable;
 import com.darwino.domino.napi.struct.BaseStruct;
 import com.darwino.domino.napi.util.DominoNativeUtils;
 
-public abstract class NSFBase {
+public abstract class NSFBase implements Freeable {
 	
 	private static final LogMgr logMemory = DominoNativeUtils.NAPI_MEMORY_LOG;
 	
@@ -40,6 +41,8 @@ public abstract class NSFBase {
 
 	private static boolean TRACE_CREATION = false;
     private Throwable creationTrace;
+    
+    
     
     /**
      * Configures whether the stack trace at creation should be stored inside each struct, for memory-
@@ -75,9 +78,11 @@ public abstract class NSFBase {
 	public synchronized final void retain() {
 		refCount++;
 	}
+	@Override
 	public synchronized final void free() {
 		free(false, true);
 	}
+	@Override
 	public synchronized final void free(boolean force) {
 		free(force, true);
 	}
@@ -257,6 +262,7 @@ public abstract class NSFBase {
 	 * 
 	 * @return whether or not the object's back-end references are valid
 	 */
+	@Override
 	public abstract boolean isRefValid();
 	
 	protected void _checkRefValidity() {

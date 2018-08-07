@@ -23,6 +23,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import com.darwino.domino.napi.c.C;
+import com.darwino.domino.napi.runtime.Freeable;
 
 
 
@@ -32,7 +33,7 @@ import com.darwino.domino.napi.c.C;
  * 
  * @author priand
  */
-public abstract class BaseStruct {
+public abstract class BaseStruct implements Freeable {
 
 	static {
 		initNative();
@@ -101,9 +102,11 @@ public abstract class BaseStruct {
 		super.finalize();
 	}
 
+    @Override
 	public final void free() {
 		free(false);
     }
+    @Override
 	public final void free(boolean force) {
 		if(data!=0 && (force||owned)) {
             C.free(data);
@@ -217,7 +220,8 @@ public abstract class BaseStruct {
 	 * Misc.
 	 ********************************************************************************/
     
-    protected boolean isRefValid() {
+    @Override
+    public boolean isRefValid() {
     	return data != 0;
     }
 	
