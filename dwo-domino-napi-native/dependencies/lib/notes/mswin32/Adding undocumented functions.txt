@@ -1,0 +1,18 @@
+Unlike 64-bit Windows, 32-bit uses decorated function names, so the default dumpbin export
+described there doesn't work.
+
+Instead, the technique is to modify the stock nNOTES.def and build the lib from that. The
+needed format is __stdcall from https://msdn.microsoft.com/en-us/library/56h2zst2.aspx
+
+The second @number value CAN be retrieved from the dumpbin export, though, so it's still useful -
+it's the first column. The quick way to get the parameter length for an undocumented function is
+to attempt to link it as-is and get the decorated name from the error message.
+
+Note: for some reason, even though the official .def file includes underscores in front of function
+names, these have to be _removed_ when generating with the lib command. Maybe the toolchain changed
+over time.
+
+Once that's tweaked, then the lib can be generated in a command prompt with the VC vars set (such
+as from the bat file in the bin dir):
+
+lib /def:nnotes.def /out:notes.lib /machine:x86

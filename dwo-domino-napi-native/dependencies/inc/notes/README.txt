@@ -1,0 +1,1 @@
+Place the files from the "include" diretory of the IBM C API Toolkit for Notes/Domino 9.0.1 here, available from https://www.ibm.com/developerworks/develop/collaboration/index.html
