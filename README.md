@@ -2,6 +2,8 @@
 
 The [Darwino Domino NAPI](https://github.com/darwino/domino-napi) provides Java access to the Notes/Domino C API via JNI, as well as a set of wrapper classes for easier programming. It is similar to the NAPI included in Domino, but covers more functionality and is not proprietary.
 
+The library is available in [OpenNTF's Maven Server](https://artifactory.openntf.org) with the identifier `com.darwino.domino:com.darwino.domino.napi:2.2.0-SNAPSHOT`.
+
 ## Usage
 
 To access the bound C API functions directly, use the `com.darwino.domino.napi.DominoAPI` class's `.get()` method, which provides access to each of the C functions. Additionally, the `com.darwino.domino.napi.C` class provides static methods and properties for data-type sizing and memory access.
