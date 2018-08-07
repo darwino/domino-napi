@@ -97,7 +97,6 @@
                         <exclude>lib/**</exclude>
                         <exclude>dependencies/**</exclude>
                         <exclude>build-eclipse/**</exclude>
-                        <exclude>build-macosx32/**</exclude>
                         <exclude>build-macosx64/**</exclude>
                         <exclude>build-xcode/**</exclude>
                         <exclude>build-win32/**</exclude>

@@ -19,6 +19,9 @@ Thumbs.db
 # Android
 gen/
 
+# Visual Studio Code
+.vscode/
+
 # Maven
 target/
 pom.xml.tag
@@ -31,7 +34,3 @@ dependency-reduced-pom.xml
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
 hs_err_pid*
-eclipse/plugins/com.darwino.domino.updatesite/artifacts.jar
-eclipse/plugins/com.darwino.domino.updatesite/content.jar
-eclipse/plugins/com.darwino.domino.updatesite/features/
-eclipse/plugins/com.darwino.domino.updatesite/plugins/

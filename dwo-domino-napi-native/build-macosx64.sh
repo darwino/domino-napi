@@ -15,7 +15,6 @@
 # limitations under the License.
 #
 
-
 echo "Configuring for Eclipse"
 rm -rf build-eclipse
 mkdir build-eclipse && cd build-eclipse
