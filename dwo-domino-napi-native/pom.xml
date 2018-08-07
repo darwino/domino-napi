@@ -104,7 +104,6 @@
                         <exclude>build-win64/**</exclude>
                         <exclude>build-linux32/**</exclude>
                         <exclude>build-linux64/**</exclude>
-			            <exclude>src/main/include/**</exclude>
                         <exclude>tools/reimp/**</exclude>
 					</excludes>
 					<properties>
