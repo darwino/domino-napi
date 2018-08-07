@@ -4,7 +4,9 @@ There are two components to the NAPI, each with their own environment requiremen
 
 ## Native Code 
 
-The C++ code is in the `dwo-domino-napi-native` folder and has a few dependencies that must be configured separately:
+The C++ code is in the `dwo-domino-napi-native` folder. Binary versions of the libraries are kept in the repo, and so it is not necessary to rebuild this unless there is a change on the C++ side. By default, the prebuilt files will be installed by a `mvn install`.
+
+To do a build for each platform, there are several external dependencies to configure:
 
 * The header files from the "include" folder of the [IBM C API Toolkit for Notes/Domino 9.0.1](https://www.ibm.com/developerworks/develop/collaboration/index.html), placed in the "dependencies/notes" directory in that project
 * CMake, installed from https://cmake.org or via your OS's package manager
@@ -13,6 +15,7 @@ The C++ code is in the `dwo-domino-napi-native` folder and has a few dependencie
     * Linux: gcc/g++
     * Windows: MSVC 15+
 * Java JDK 6+ and `JAVA_HOME` set
+* A bitness-compatible Notes or Domino runtime (e.g. the Notes client for 32-bit Windows or a 64-bit Domino server for 64-bit Windows) and the `notes-program` Maven property set in your settings.xml to the filesystem path to the program root
 
 ## Java Code
 
