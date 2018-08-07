@@ -1,0 +1,25 @@
+IBM C API Toolkit for Notes/Domino 9.0.1 Redistributables:
+
+The following list includes files that are provided to Licensee pursuant to the Redistributables section of the IBM International Program License Agreements License Information that applies to this Program:
+
+All object files in the following list may be redistributed:
+	- notesapi\lib\aix\notes0.o
+	- notesapi\lib\aix\notesai0.o
+	- notesapi\lib\aix64\notes0.o
+	- notesapi\lib\aix64\notesai0.o
+	- notesapi\lib\linux\notes0.o
+	- notesapi\lib\linux\notesai0.o
+	- notesapi\lib\linux64\notes0.o
+	- notesapi\lib\linux64\notesai0.o
+	- notesapi\lib\zlinux64\notes0.o
+	- notesapi\lib\zlinux64\notesai0.o
+	- notesapi\lib\macosx\notes0.o
+	- notesapi\lib\macosx\notesai0.o
+	- notesapi\lib\mswin32\notes0.obj
+	- notesapi\lib\mswin32\notesai0.obj
+	- notesapi\lib\mswin32\notes.lib
+	- notesapi\lib\mswin64\notes0.obj
+	- notesapi\lib\mswin64\notesai0.obj
+	- notesapi\lib\mswin64\notes.lib
+	- notesapi\lib\IBM i\lncapi90.savf
+	- notesapi\lib\IBM i\lncinc90.savf
