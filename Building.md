@@ -15,7 +15,9 @@ To do a build for each platform, there are several external dependencies to conf
     * Linux: gcc/g++
     * Windows: MSVC 15+
 * Java JDK 6+ and `JAVA_HOME` set
-* A bitness-compatible Notes or Domino runtime (e.g. the Notes client for 32-bit Windows or a 64-bit Domino server for 64-bit Windows) and the `notes-program` Maven property set in your settings.xml to the filesystem path to the program root
+* For Linux and macOS, a bitness-compatible Notes or Domino runtime and the `notes-program` Maven property set in your settings.xml to the filesystem path to the program root
+    * Note: on macOS, the program root will be something like `/Applications/IBM Notes.app/Contents/MacOS`
+    * Note: on Windows, the installation is not required, but the `notes-program` property must still be set to at least an arbitrary value to kick off native compilation
 
 ## Java Code
 
