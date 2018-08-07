@@ -15,7 +15,6 @@
  */
 package com.darwino.domino.napi.struct;
 
-import com.darwino.domino.napi.DominoAPI;
 import com.darwino.domino.napi.c.C;
 import com.darwino.domino.napi.enums.CmdArgID;
 import com.darwino.domino.napi.enums.CmdArgValueType;

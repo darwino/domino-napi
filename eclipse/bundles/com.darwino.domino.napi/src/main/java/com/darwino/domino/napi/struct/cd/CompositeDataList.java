@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
-import com.darwino.domino.napi.util.CDUtil;
 import com.ibm.commons.util.NotImplementedException;
 
 /**
