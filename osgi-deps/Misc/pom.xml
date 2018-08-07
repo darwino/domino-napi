@@ -41,70 +41,7 @@
 						</goals>
 						<configuration>
 							<artifacts>
-								<artifact><id>org.openntf.sbt:com.ibm.sbt.libs:1.5.0.20160704-1200</id></artifact>
-								<artifact><id>org.openntf.sbt:com.ibm.sbt.core:1.5.0.20160704-1200</id></artifact>
-								<artifact><id>com.google.code.findbugs:jsr305:3.0.2</id></artifact>
-								<artifact><id>org.postgresql:postgresql:9.4.1212.jre6</id></artifact>
-								<artifact><id>com.jolbox:bonecp:0.8.0.RELEASE</id></artifact>
-								<artifact><id>com.zaxxer:HikariCP-java6:2.3.9</id></artifact>
-								<artifact><id>com.google.guava:guava:15.0</id></artifact>
-								<artifact><id>org.javassist:javassist:3.20.0-GA</id></artifact>
-								<artifact><id>javax.inject:javax.inject:1</id></artifact>
-								<artifact><id>org.codehaus.groovy:groovy-all:2.4.12</id></artifact>
-								<artifact><id>org.slf4j:slf4j-simple:1.7.21</id></artifact>
-								<artifact><id>com.graphql-java:graphql-java:2.4.0</id></artifact>
-								<artifact><id>org.antlr:antlr4-runtime:4.5.1</id></artifact>
-								<artifact><id>javax.security.jacc:javax.security.jacc-api:1.6</id></artifact>
-								<artifact><id>javax.validation:validation-api:1.0.0.GA</id></artifact>
 								<artifact><id>com.sun.mail:javax.mail:1.5.3</id></artifact>
-								
-								<!-- Re-brand Apache HTTP to avoid split dependencies -->
-								<artifact>
-									<id>org.apache.httpcomponents:httpclient:4.3.3</id>
-									<override>true</override>
-									<instructions>
-										<Bundle-SymbolicName>com.darwino.org.apache.httpcomponents.httpclient</Bundle-SymbolicName>
-										<Require-Bundle>com.darwino.org.apache.httpcomponents.httpcore</Require-Bundle>
-										<Import-Package>
-											javax.crypto,
-											javax.crypto.spec,
-											javax.net,
-											javax.security.auth.x500,
-											org.apache.commons.codec,
-											org.apache.commons.codec.binary,
-											org.apache.commons.logging,
-											org.ietf.jgss,
-											org.osgi.framework,
-											org.osgi.service.cm
-										</Import-Package>
-									</instructions>
-								</artifact>
-								<artifact>
-									<id>org.apache.httpcomponents:httpcore:4.3.3</id>
-									<override>true</override>
-									<instructions>
-										<Bundle-SymbolicName>com.darwino.org.apache.httpcomponents.httpcore</Bundle-SymbolicName>
-										<Import-Package>
-											javax.net;resolution:=optional,
-											javax.net.ssl;resolution:=optional
-										</Import-Package>
-									</instructions>
-								</artifact>
-								<artifact>
-									<id>org.apache.httpcomponents:httpmime:4.3.3</id>
-									<override>true</override>
-									<instructions>
-										<Bundle-SymbolicName>com.darwino.org.apache.httpcomponents.httpmime</Bundle-SymbolicName>
-										<Require-Bundle>com.darwino.org.apache.httpcomponents.httpcore</Require-Bundle>
-										<Import-Package/>
-									</instructions>
-								</artifact>
-								
-								<!-- JDBC drivers to appease the Tycho compiler -->
-								<artifact><id>org.firebirdsql.jdbc:jaybird-jdk16:2.2.5</id></artifact>
-								<artifact><id>com.darwino.dependencies.db2:db2jcc4:10.5</id></artifact>
-								<artifact><id>com.darwino.dependencies.oracle:ojdbc7:12.1</id></artifact>
-								<artifact><id>org.xerial:sqlite-jdbc:3.8.7</id></artifact>
 							</artifacts>
 							<p2>
 								<artifact>
