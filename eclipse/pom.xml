@@ -68,6 +68,7 @@
 		<module>features/com.darwino.domino.napi.feature</module>
 		
 		<module>releng/com.darwino.domino.napi.updatesite</module>
+		<module>releng/domino-napi-dist</module>
 	</modules>
 	
 	<repositories>
