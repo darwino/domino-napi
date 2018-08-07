@@ -4,7 +4,7 @@ Bundle-Name: Darwino Domino NAPI
 Bundle-SymbolicName: com.darwino.domino.napi
 Automatic-Module-Name: com.darwino.domino.napi
 Bundle-Version: 2.2.0.qualifier
-Bundle-Vendor: DARWINO
+Bundle-Vendor: Darwino, Inc.
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Require-Bundle: com.ibm.notes.java.api;resolution:=optional,
  com.ibm.commons;visibility:=reexport

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <feature url="features/com.darwino.domino.napi.feature_2.2.0.qualifier.jar" id="com.darwino.domino.napi.feature" version="2.2.0.qualifier">
+      <category name="Darwino Domino NAPI"/>
+   </feature>
+</site>

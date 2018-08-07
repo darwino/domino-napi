@@ -5,6 +5,37 @@
 	<artifactId>parent-dwo-domino-napi</artifactId>
 	<version>2.2.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
+    
+    <name>Darwino Domino NAPI</name>
+    
+    <url>https://www.darwino.com</url>
+    <inceptionYear>2014</inceptionYear>
+
+	<licenses>
+		<license>
+			<name>The Apache Software License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+		</license>
+	</licenses>
+	
+	<distributionManagement>
+		<repository>
+			<id>artifactory.openntf.org</id>
+			<name>artifactory.openntf.org</name>
+			<url>https://artifactory.openntf.org/openntf</url>
+		</repository>
+	</distributionManagement>
+
+	<developers>
+		<developer>
+			<name>Philippe Riand</name>
+			<email>phil@darwino.com</email>
+		</developer>
+		<developer>
+			<name>Jesse Gallagher</name>
+			<email>jesse@darwino.com</email>
+		</developer>
+	</developers>
 	
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -19,7 +50,7 @@
 		<osgi.qualifier>${maven.build.timestamp}</osgi.qualifier>
 		
 		<!-- This is used below for pointing to the osgi-deps base path. It is re-compiled per-project -->
-		<osgi-deps-path>${project.baseUri}../../osgi-deps</osgi-deps-path>
+		<osgi-deps-path>${project.baseUri}../../../osgi-deps</osgi-deps-path>
 		
 		<maven.version>3.2.1</maven.version>
 	</properties>
@@ -29,9 +60,14 @@
 	</prerequisites>
 	
 	<modules>
-		<module>com.darwino.domino.napi</module>
-		<module>com.darwino.domino.napi.test</module>
-		<module>com.darwino.domino.napi.feature</module>
+		<module>bundles/com.darwino.domino.napi</module>
+		<module>bundles/com.darwino.domino.napi.xsp</module>
+		
+		<module>tests/com.darwino.domino.napi.test</module>
+		
+		<module>features/com.darwino.domino.napi.feature</module>
+		
+		<module>releng/com.darwino.domino.napi.updatesite</module>
 	</modules>
 	
 	<repositories>
@@ -201,13 +237,27 @@
 					</execution>
 				</executions>
 			</plugin>
-			
-			<!-- <plugin>
-				<groupId>org.openntf.maven</groupId>
-				<artifactId>nsfodp-maven-plugin</artifactId>
-				<version>1.1.0-SNAPSHOT</version>
-				<extensions>true</extensions>
-			</plugin> -->
+
+			<plugin>
+				<groupId>com.mycila</groupId>
+				<artifactId>license-maven-plugin</artifactId>
+				<version>3.0</version>
+				<configuration>
+					<aggregate>true</aggregate>
+					<header>license.txt</header>
+					<excludes>
+						<exclude>**/pom.xml</exclude>
+			            <exclude>**/README</exclude>
+			            <exclude>src/test/resources/**</exclude>
+			            <exclude>src/main/resources/**</exclude>
+						<exclude>**/build.properties</exclude>
+					</excludes>
+					<properties>
+						<owner>Darwino, Inc.</owner>
+						<copyrightYear>2018</copyrightYear>
+					</properties>
+				</configuration>
+			</plugin>
 			
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>

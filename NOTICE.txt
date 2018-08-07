@@ -1,0 +1,7 @@
+Darwino Domino NAPI
+Copyright (C) 2014-2018 Darwino Inc.
+For license information see the LICENSE file which accompanies this NOTICE.txt file.
+
+The Darwino Domino NAPI includes third-party code from the following sources:
+
+1. Code from the OpenNTF Domino API, available from https://github.com/OpenNTF/org.openntf.domino and licensed under the Apache License 2.0
