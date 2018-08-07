@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.0)
 
 ## start setting
 SET (this_target DominoNativeApi)
@@ -33,7 +33,7 @@ if($ENV{DARWINO_BUILDTYPE} STREQUAL "Win32")
 	####################################################################################
 	
 	message (STATUS "Using Win32")
-	set (jre_inc dependencies/inc/jre/win32)
+	find_package(JNI REQUIRED)
 	
 	add_definitions("-DWIN32 -D_WINDOWS -D_WINDLL -D_USRDLL -D_X86_=1 -DWIN32 -D_WIN32 -W3 -DHANDLE_IS_32BITS -DNT -DW32 -DW -DW64 /DNT -D_CRT_SECURE_NO_WARNINGS")
 	
@@ -66,7 +66,7 @@ elseif($ENV{DARWINO_BUILDTYPE} STREQUAL "Win64")
 	####################################################################################
 	
 	message (STATUS "Using Win64")
-	set (jre_inc dependencies/inc/jre/win32)
+	find_package(JNI REQUIRED)
 	
 	add_definitions("-DWIN32 -DNDEBUG -D_WINDOWS -D_WINDLL -D_USRDLL -DDOMINOSQL_EXPORTS -D_AMD64_ -DHANDLE_IS_32BITS -DNT -DW32 -DW -DW64 -DND64 -D_CRT_SECURE_NO_WARNINGS")
 	
@@ -99,10 +99,11 @@ elseif($ENV{DARWINO_BUILDTYPE} STREQUAL "macosx64")
 	####################################################################################
 	
 	message (STATUS "Using Mac OS X 64-bit")
+
+	set(JAVA_INCLUDE_PATH $ENV{JAVA_HOME}/include $ENV{JAVA_HOME}/include/darwin)
 	
 	set(CMAKE_MACOSX_RPATH 1)
 	
-	set (jre_inc dependencies/inc/jre/darwin)
 	#set (notes_lib ${CMAKE_CURRENT_LIST_DIR}/dependencies/lib/notes/macosx64/notes0.o)
 	set (notes_lib "$ENV{Notes_ExecDirectory}/libnotes.dylib")
 	
@@ -119,8 +120,8 @@ elseif($ENV{DARWINO_BUILDTYPE} STREQUAL "linux64")
 	####################################################################################
 	
 	message (STATUS "Using Linux 64-bit")
+	find_package(JNI REQUIRED)
 	
-	set (jre_inc dependencies/inc/jre/linux)
 	set (notes_lib $ENV{Notes_ExecDirectory}/libnotes.so)
 	#set (notes_lib "")
 	
@@ -137,8 +138,8 @@ elseif($ENV{DARWINO_BUILDTYPE} STREQUAL "linux32")
 	####################################################################################
 	
 	message (STATUS "Using Linux 32-bit")
+	find_package(JNI REQUIRED)
 	
-	set (jre_inc dependencies/inc/jre/linux)
 	set (notes_lib $ENV{Notes_ExecDirectory}/libnotes.so)
 	#set (notes_lib "")
 	
@@ -155,7 +156,7 @@ endif()
 
 ## section: include directory
 INCLUDE_DIRECTORIES(
-	${jre_inc}
+	${JAVA_INCLUDE_PATH}
 	dependencies/inc/jre
 	dependencies/inc/notes
 	src/main/include
