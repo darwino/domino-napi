@@ -22,6 +22,7 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 
 import com.ibm.commons.log.LogMgr;
+import com.darwino.domino.napi.DominoAPI;
 import com.darwino.domino.napi.DominoException;
 import com.darwino.domino.napi.c.C;
 import com.darwino.domino.napi.c.IntRef;
@@ -32,7 +33,6 @@ public class NSFNoteIDCollection extends NSFHandle implements Set<Integer> {
 	private static final LogMgr log = DominoNativeUtils.NAPI_LOG;
 	
 	private long modified = 0;
-	private final boolean destroyOnFree;
 
 	/**
 	 * @param session the parent {@link NSFSession} for the collection
@@ -42,7 +42,9 @@ public class NSFNoteIDCollection extends NSFHandle implements Set<Integer> {
 	 */
 	public NSFNoteIDCollection(NSFSession session, long handle, boolean destroyOnFree) {
 		super(session, handle);
-		this.destroyOnFree = destroyOnFree;
+		if(!destroyOnFree) {
+			recycler.setFreed(true);
+		}
 	}
 
 	@Override
@@ -283,20 +285,30 @@ public class NSFNoteIDCollection extends NSFHandle implements Set<Integer> {
 	}
 	
 	@Override
-	protected void doFree() {
-		if(destroyOnFree && getHandle() != 0) {
-			if(log.isTraceDebugEnabled()) {
-				log.traceDebug("Going to destroy IDTable with handle {0}", this.getHandle()); //$NON-NLS-1$
-			}
-			
-			try {
-				api.IDDestroyTable(getHandle());
-			} catch(DominoException e) {
-				// This should be very unlikely
-				throw new RuntimeException(e);
+	protected Recycler createRecycler() {
+		return new IDCollectionRecycler(api, getHandle());
+	}
+	
+	static class IDCollectionRecycler extends Recycler {
+		private final DominoAPI api;
+		private long handle;
+		
+		public IDCollectionRecycler(DominoAPI api, long handle) {
+			this.api = api;
+			this.handle = handle;
+		}
+
+		@Override
+		void doFree() {
+			if(handle != 0) {
+				try {
+					api.IDDestroyTable(handle);
+				} catch(DominoException e) {
+					// This should be very unlikely
+					throw new RuntimeException(e);
+				}
 			}
 		}
-		super.doFree();
 	}
 	
 	private class NSFNoteIDCollectionIterator implements Iterator<Integer> {

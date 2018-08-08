@@ -91,6 +91,12 @@ public class NSFFileAttachment extends NSFBase {
 		// NOP
 	}
 	
+	@Override
+	protected Recycler createRecycler() {
+		// NOP
+		return null;
+	}
+	
 	/* (non-Javadoc)
 	 * @see com.darwino.domino.napi.wrap.NSFBase#isRefValid()
 	 */

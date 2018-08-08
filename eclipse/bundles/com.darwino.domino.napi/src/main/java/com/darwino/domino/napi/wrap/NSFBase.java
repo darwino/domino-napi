@@ -18,16 +18,16 @@ package com.darwino.domino.napi.wrap;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 import com.ibm.commons.log.LogMgr;
 import com.ibm.commons.util.StringUtil;
 import com.darwino.domino.napi.DominoAPI;
-import com.darwino.domino.napi.runtime.Freeable;
 import com.darwino.domino.napi.struct.BaseStruct;
 import com.darwino.domino.napi.util.DominoNativeUtils;
 
-public abstract class NSFBase implements Freeable {
+public abstract class NSFBase {
 	
 	private static final LogMgr logMemory = DominoNativeUtils.NAPI_MEMORY_LOG;
 	
@@ -42,6 +42,42 @@ public abstract class NSFBase implements Freeable {
 	private static boolean TRACE_CREATION = false;
     private Throwable creationTrace;
     
+    protected final Recycler recycler;
+    
+    Recycler getRecycler() {
+    	return recycler;
+    }
+    
+    /**
+     * This class represents a reference-free holder for code that is able to free
+     * back-end resources used by a wrapper object after the object itself has
+     * been garbage collected.
+     * 
+     * <p>Subclasses must also be static and contain no strong reference back to their
+     * associated object.</p>
+     * 
+     * @author Jesse Gallagher
+     * @since 2.2.0
+     */
+    protected abstract static class Recycler {
+    	private boolean freed = false;
+    	
+    	public boolean isFreed() {
+			return freed;
+		}
+    	public void setFreed(boolean freed) {
+			this.freed = freed;
+		}
+    	
+    	public void free() {
+    		if(!freed) {
+    			doFree();
+    			freed = true;
+    		}
+    	}
+    	
+    	abstract void doFree();
+    }
     
     
     /**
@@ -69,6 +105,10 @@ public abstract class NSFBase implements Freeable {
 		if(TRACE_CREATION) {
         	creationTrace = new Exception();
         }
+		
+		this.recycler = this.createRecycler();
+		
+		NSFReferenceCache.get().register(this);
 	}
 
 	/**
@@ -78,11 +118,9 @@ public abstract class NSFBase implements Freeable {
 	public synchronized final void retain() {
 		refCount++;
 	}
-	@Override
 	public synchronized final void free() {
 		free(false, true);
 	}
-	@Override
 	public synchronized final void free(boolean force) {
 		free(force, true);
 	}
@@ -101,11 +139,19 @@ public abstract class NSFBase implements Freeable {
 						child.free(true, false);
 					}
 				}
+				children.remove(i);
 			}
-			for(BaseStruct child : childStructs) {
+			Iterator<BaseStruct> structs = childStructs.iterator();
+			while(structs.hasNext()) {
+				BaseStruct child = structs.next();
 				child.free();
+				structs.remove();
 			}
-			doFree();
+			
+			if(recycler != null) {
+				recycler.free();
+			}
+			
 			if(removeFromParent) {
 				removeFromParent();
 			}
@@ -137,7 +183,7 @@ public abstract class NSFBase implements Freeable {
 				logMemory.traceDebug("{0}: addChild #{1} ({2})", getClass().getName(), children.size(), child.getClass().getName()); //$NON-NLS-1$
 			}
 		}
-		children.add(child);
+		// children.add(child);
 		return child;
 	}
 	/**
@@ -156,15 +202,15 @@ public abstract class NSFBase implements Freeable {
 				logMemory.traceDebug("{0}: removeChild #{1} ({2})", getClass().getName(), children.size(), child.getClass().getName()); //$NON-NLS-1$
 			}
 		}
-		children.remove(child);
+		// children.remove(child);
 		return child;
 	}
 	protected <T extends BaseStruct> T addChildStruct(T child) {
-		childStructs.add(child);
+		// childStructs.add(child);
 		return child;
 	}
 	protected <T extends BaseStruct> T removeChildStruct(T child) {
-		childStructs.remove(child);
+		// childStructs.remove(child);
 		return child;
 	}
 	
@@ -219,17 +265,17 @@ public abstract class NSFBase implements Freeable {
 	 * 	NSFView</pre>
 	 */
 	public void debugPrintChildHierarchy() {
-		System.out.println(getClass().getSimpleName() + "#" + System.identityHashCode(this));
+		System.out.println(getClass().getSimpleName() + "#" + System.identityHashCode(this)); //$NON-NLS-1$
 		for(NSFBase child : children) {
-			System.out.println("\t" + child.getClass().getSimpleName() + "#" + System.identityHashCode(child));
-			_debugPrintGrandchildren(child, "\t\t");
+			System.out.println("\t" + child.getClass().getSimpleName() + "#" + System.identityHashCode(child)); //$NON-NLS-1$ //$NON-NLS-2$
+			_debugPrintGrandchildren(child, "\t\t"); //$NON-NLS-1$
 		}
 	}
 	private void _debugPrintGrandchildren(NSFBase child, String prefix) {
 		for(NSFBase grandchild : child.children) {
-			System.out.println(prefix + grandchild.getClass().getSimpleName() + "#" + System.identityHashCode(grandchild));
+			System.out.println(prefix + grandchild.getClass().getSimpleName() + "#" + System.identityHashCode(grandchild)); //$NON-NLS-1$
 			
-			_debugPrintGrandchildren(grandchild, prefix + "\t");
+			_debugPrintGrandchildren(grandchild, prefix + "\t"); //$NON-NLS-1$
 		}
 	}
 	
@@ -250,11 +296,21 @@ public abstract class NSFBase implements Freeable {
 	/**
 	 * This method is called when the final reference to this object is freed.
 	 * 
-	 * <p>Implemented classes are expected to release any memory or network resources they have open.
-	 * They are also expected to write this defensively, allowing the method to be called multiple times
-	 * on the same object without problem.</p>
+	 * <p>Implementing classes should use this method to clear any instance variables, such as
+	 * resetting a handle to 0.</p>
 	 */
 	protected abstract void doFree();
+	/**
+	 * This method creates a {@link Recycler} instance capable of closing any back-end resources
+	 * used by this object.
+	 * 
+	 * <p>Implementing classes are expected to release any memory or network resources they have open.
+	 * They are also expected to write this defensively, allowing the method to be called multiple times
+	 * on the same object without problem.</p>
+	 * 
+	 * @return a {@link Recycler} object appropriate for this class, or {@code null} if it is not needed
+	 */
+	protected abstract Recycler createRecycler();
 	
 	/**
 	 * Checks whether the object's inner reference is valid. The meaning of this varies from object to object,
@@ -262,7 +318,6 @@ public abstract class NSFBase implements Freeable {
 	 * 
 	 * @return whether or not the object's back-end references are valid
 	 */
-	@Override
 	public abstract boolean isRefValid();
 	
 	protected void _checkRefValidity() {

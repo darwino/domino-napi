@@ -17,6 +17,7 @@ package com.darwino.domino.napi.wrap;
 
 import static com.darwino.domino.napi.DominoAPI.*;
 
+import com.darwino.domino.napi.DominoAPI;
 import com.ibm.commons.log.LogMgr;
 import com.darwino.domino.napi.DominoException;
 import com.darwino.domino.napi.c.C;
@@ -41,7 +42,6 @@ public class NSFViewEntryCollection extends NSFBase {
 	private static final LogMgr log = DominoNativeUtils.NAPI_LOG;
 	
 	private final NSFView parent;
-	private final COLLECTIONPOSITION position;
 	private final int returnCount;
 	private final int keyMatches;
 	private int readMask;
@@ -53,7 +53,7 @@ public class NSFViewEntryCollection extends NSFBase {
 		super(parent.getAPI());
 		
 		this.parent = parent;
-		this.position = addChildStruct(position);
+		((ViewEntryCollectionRecycler)recycler).position = addChildStruct(position);
 		this.returnCount = returnCount;
 		this.keyMatches = keyMatches;
 		this.readMask = readMask;
@@ -124,7 +124,7 @@ public class NSFViewEntryCollection extends NSFBase {
 			
 			long hBuffer = api.NIFReadEntries(
 				parent.getCollectionHandle(),
-				position,
+				((ViewEntryCollectionRecycler)recycler).position,
 				// TODO change when FT search is implemented - add NAVIGATE_NEXT_HIT
 				NAVIGATE_NEXT,
 				1,
@@ -189,7 +189,7 @@ public class NSFViewEntryCollection extends NSFBase {
 		
 		long hBuffer = api.NIFReadEntries(
 			parent.getCollectionHandle(),
-			position,
+			((ViewEntryCollectionRecycler)recycler).position,
 			// TODO change when FT search is implemented - add NAVIGATE_NEXT_HIT
 			NAVIGATE_NEXT,
 			1,
@@ -245,9 +245,27 @@ public class NSFViewEntryCollection extends NSFBase {
 	
 	@Override
 	protected void doFree() {
-		if(position != null) {
-			position.free();
+		// NOP
+	}
+	
+	static class ViewEntryCollectionRecycler extends Recycler {
+		private final DominoAPI api;
+		COLLECTIONPOSITION position;
+		
+		public ViewEntryCollectionRecycler(DominoAPI api) {
+			this.api = api;
 		}
+		
+		@Override
+		void doFree() {
+			if(position != null) {
+				position.free();
+			}
+		}
+	}
+	@Override
+	protected Recycler createRecycler() {
+		return new ViewEntryCollectionRecycler(api);
 	}
 	
 	/* (non-Javadoc)
@@ -255,7 +273,7 @@ public class NSFViewEntryCollection extends NSFBase {
 	 */
 	@Override
 	public boolean isRefValid() {
-		return position.getDataPtr() != 0;
+		return ((ViewEntryCollectionRecycler)recycler).position.getDataPtr() != 0;
 	}
 	
 	/* ******************************************************************************

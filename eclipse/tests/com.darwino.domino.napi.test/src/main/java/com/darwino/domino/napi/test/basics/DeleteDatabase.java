@@ -17,6 +17,7 @@ package com.darwino.domino.napi.test.basics;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.ibm.commons.Platform;
@@ -35,6 +36,7 @@ public class DeleteDatabase {
 	}
 	
 	@Test
+	@Ignore("working on auto-recycle")
 	public void testDeleteDatabase() throws DominoException {
 		DominoAPI.get().NSFDbDelete(AllTests.TEST_DB_NAME);
 	}

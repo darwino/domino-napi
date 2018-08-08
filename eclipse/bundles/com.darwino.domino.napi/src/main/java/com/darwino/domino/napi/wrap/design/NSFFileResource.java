@@ -53,4 +53,10 @@ public class NSFFileResource extends NSFDesignNoteBase {
 			cd.free();
 		}
 	}
+	
+	@Override
+	protected Recycler createRecycler() {
+		// NOP
+		return null;
+	}
 }

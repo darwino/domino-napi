@@ -28,5 +28,11 @@ public class NSFOutline extends NSFDesignNoteBase {
 	public NSFOutline(NSFDatabase parent, int noteId) {
 		super(parent, noteId);
 	}
+	
+	@Override
+	protected Recycler createRecycler() {
+		// NOP
+		return null;
+	}
 
 }

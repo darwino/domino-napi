@@ -58,7 +58,6 @@ public class NSFSession extends NSFBase {
 		return new NSFSession(api, lotusSession.getEffectiveUserName(), internetSession, fullAccess);
 	}
 	
-	private final long hNamesList;
 	private final Map<Long, NSFDatabase> databasesByHandle = new HashMap<Long, NSFDatabase>();
 	private File tempDir;
 	
@@ -69,7 +68,7 @@ public class NSFSession extends NSFBase {
 	 */
 	public NSFSession(DominoAPI api) {
 		super(api);
-		this.hNamesList = 0;
+		((SessionRecycler)recycler).hNamesList = 0;
 	}
 	/**
 	 * Creates a new named session object. This session uses an internal names list to manage access.
@@ -84,12 +83,12 @@ public class NSFSession extends NSFBase {
 		super(api);
 		if(StringUtil.equals(effectiveUserName, getUserName())) {
 			// Don't bother maintaining the names list when it's already the same name
-			this.hNamesList = 0;
+			((SessionRecycler)recycler).hNamesList = 0;
 		} else {
-			this.hNamesList = api.NSFBuildNamesList(effectiveUserName, 0);
+			((SessionRecycler)recycler).hNamesList = api.NSFBuildNamesList(effectiveUserName, 0);
 			
 			// Consider the name authenticated
-			NAMES_LIST namesList = new NAMES_LIST(api.OSLock(this.hNamesList));
+			NAMES_LIST namesList = new NAMES_LIST(api.OSLock(((SessionRecycler)recycler).hNamesList));
 			try {
 				Set<NamesListAuth> flags = EnumSet.of(NamesListAuth.AUTHENTICATED);
 				if(internetSession) {
@@ -100,7 +99,7 @@ public class NSFSession extends NSFBase {
 				}
 				namesList.setAuthenticated(flags);
 			} finally {
-				api.OSUnlock(this.hNamesList);
+				api.OSUnlock(((SessionRecycler)recycler).hNamesList);
 			}
 		}
 	}
@@ -111,7 +110,7 @@ public class NSFSession extends NSFBase {
 		TIMEDATE retDataModified = new TIMEDATE();
 		TIMEDATE retNonDataModified = new TIMEDATE();
 		try {
-			hDB = api.NSFDbOpenExtended(path, (short)0, hNamesList, null, retDataModified, retNonDataModified);
+			hDB = api.NSFDbOpenExtended(path, (short)0, ((SessionRecycler)recycler).hNamesList, null, retDataModified, retNonDataModified);
 		} finally {
 			retDataModified.free();
 			retNonDataModified.free();
@@ -216,20 +215,20 @@ public class NSFSession extends NSFBase {
 	}
 	
 	public long getNamesListHandle() {
-		return this.hNamesList;
+		return ((SessionRecycler)recycler).hNamesList;
 	}
 	
 	public String[] getUserNamesList() throws DominoException {
-		if(hNamesList == 0) {
+		if(((SessionRecycler)recycler).hNamesList == 0) {
 			return getUserNamesList(getUserName());
 		} else {
-			long namesListPtr = api.OSLock(hNamesList);
+			long namesListPtr = api.OSLock(((SessionRecycler)recycler).hNamesList);
 			try {
 				NAMES_LIST namesList = new NAMES_LIST(namesListPtr);
 				String[] names = namesList.getNames();
 				return names;
 			} finally {
-				api.OSUnlock(hNamesList);
+				api.OSUnlock(((SessionRecycler)recycler).hNamesList);
 			}
 		}
 	}
@@ -445,11 +444,29 @@ public class NSFSession extends NSFBase {
 	
 	@Override
 	protected void doFree() {
-		if(hNamesList != 0) {
-			try {
-				api.OSMemFree(hNamesList);
-			} catch(DominoException e) { }
+		// NOP
+	}
+	
+	static class SessionRecycler extends Recycler {
+		long hNamesList;
+		private final DominoAPI api;
+		
+		public SessionRecycler(DominoAPI api) {
+			this.api = api;
 		}
+		
+		@Override
+		void doFree() {
+			if(hNamesList != 0) {
+				try {
+					api.OSMemFree(hNamesList);
+				} catch(DominoException e) { }
+			}
+		}
+	}
+	@Override
+	protected Recycler createRecycler() {
+		return new SessionRecycler(api);
 	}
 	
 	/* (non-Javadoc)

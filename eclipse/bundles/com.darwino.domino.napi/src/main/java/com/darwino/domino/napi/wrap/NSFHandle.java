@@ -16,9 +16,40 @@
 package com.darwino.domino.napi.wrap;
 
 import com.darwino.domino.napi.DominoAPI;
+import com.darwino.domino.napi.DominoException;
 import com.ibm.commons.util.StringUtil;
 
 public abstract class NSFHandle extends NSFBase {
+
+	/**
+	 * This {@link Recycler} implementation uses {@link DominoAPI#OSMemFree(long)}
+	 * to free the provided handle, and so is useful generally for back-end entities
+	 * that are meant to be freed in that generic way.
+	 *  
+	 * @author Jesse Gallagher
+	 * @since 2.2.0
+	 */
+	protected static class OSMemFreeRecycler extends Recycler {
+		final DominoAPI api;
+		long handle;
+		
+		public OSMemFreeRecycler(DominoAPI api, long handle) {
+			this.api = api;
+			this.handle = handle;
+		}
+
+		@Override
+		void doFree() {
+			if(handle != 0) {
+				try {
+					api.OSMemFree(handle);
+					handle = 0;
+				} catch (DominoException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
 	
 	private NSFSession session;
 	private long handle;

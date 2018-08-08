@@ -319,6 +319,13 @@ public class NSFItem extends NSFBase {
 	 */
 	@Override
 	protected void doFree() {
+		// NOP
+	}
+	
+	@Override
+	protected Recycler createRecycler() {
+		// NOP
+		return null;
 	}
 	
 	/* (non-Javadoc)

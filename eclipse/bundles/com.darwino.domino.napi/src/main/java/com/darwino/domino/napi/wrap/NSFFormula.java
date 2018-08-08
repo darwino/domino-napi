@@ -31,7 +31,25 @@ import com.ibm.commons.util.StringUtil;
  */
 public class NSFFormula extends NSFHandle {
 	
-	private long compiledFormulaPtr;
+	static class FormulaRecycler extends OSMemFreeRecycler {
+		private long compiledFormulaPtr;
+		
+		public FormulaRecycler(DominoAPI api, long handle) {
+			super(api, handle);
+		}
+		
+		@Override
+		void doFree() {
+			if(compiledFormulaPtr != 0 && handle != 0) {
+				api.OSUnlockObject(handle);
+				compiledFormulaPtr = 0;
+			}
+			
+			super.doFree();
+		}
+		
+	}
+	
 	private int length;
 	private byte[] formulaData;
 
@@ -84,17 +102,17 @@ public class NSFFormula extends NSFHandle {
 	public long getCompiledFormulaPtr() {
 		_checkRefValidity();
 		
-		if(compiledFormulaPtr == 0) {
+		if(((FormulaRecycler)recycler).compiledFormulaPtr == 0) {
 			if(this.formulaData != null) {
 				// Then write the data to C memory
-				compiledFormulaPtr = C.malloc(formulaData.length);
-				C.writeByteArray(compiledFormulaPtr, 0, formulaData, 0, formulaData.length);
+				((FormulaRecycler)recycler).compiledFormulaPtr = C.malloc(formulaData.length);
+				C.writeByteArray(((FormulaRecycler)recycler).compiledFormulaPtr, 0, formulaData, 0, formulaData.length);
 			} else {
 				// Then use the handle
-				compiledFormulaPtr = api.OSLockObject(getHandle());
+				((FormulaRecycler)recycler).compiledFormulaPtr = api.OSLockObject(getHandle());
 			}
 		}
-		return compiledFormulaPtr;
+		return ((FormulaRecycler)recycler).compiledFormulaPtr;
 	}
 	
 	public int getLength() {
@@ -134,9 +152,7 @@ public class NSFFormula extends NSFHandle {
 	@Override
 	protected void doFree() {
 		if(getHandle() != 0) {
-			if(compiledFormulaPtr != 0) {
-				api.OSUnlockObject(getHandle());
-			}
+			
 			try {
 				api.OSMemFree(getHandle());
 			} catch(DominoException e) {
@@ -153,5 +169,10 @@ public class NSFFormula extends NSFHandle {
 	@Override
 	public NSFBase getParent() {
 		return getSession();
+	}
+	
+	@Override
+	protected Recycler createRecycler() {
+		return new FormulaRecycler(api, getHandle());
 	}
 }

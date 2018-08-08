@@ -929,18 +929,31 @@ public class NSFNote extends NSFHandle {
 	public List<NSFView> getContainingFolders() throws DominoException {
 		return this.getParent().getFoldersContainingNoteID(this.getNoteID());
 	}
+	
+	static class NoteRecycler extends Recycler {
+		private final DominoAPI api;
+		private long handle;
+		
+		public NoteRecycler(DominoAPI api, long handle) {
+			this.api = api;
+			this.handle = handle;
+		}
 
-	@Override
-	protected void doFree() {
-		if(this.getHandle() > 0) {
-			try {
-				api.NSFNoteClose(this.getHandle());
-			} catch(DominoException e) {
-				// This should be very unlikely
-				throw new RuntimeException(e);
+		@Override
+		void doFree() {
+			if(handle != 0) {
+				try {
+					api.NSFNoteClose(handle);
+				} catch(DominoException e) {
+					// This should be very unlikely
+					throw new RuntimeException(e);
+				}
 			}
 		}
-		super.doFree();
+	}
+	@Override
+	protected Recycler createRecycler() {
+		return new NoteRecycler(api, getHandle());
 	}
 	
 	/* (non-Javadoc)

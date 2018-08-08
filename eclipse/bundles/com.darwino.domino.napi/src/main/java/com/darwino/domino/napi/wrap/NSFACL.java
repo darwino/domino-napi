@@ -220,4 +220,9 @@ public class NSFACL extends NSFHandle {
 			aclNote.free();
 		}
 	}
+	
+	@Override
+	protected Recycler createRecycler() {
+		return new OSMemFreeRecycler(api, getHandle());
+	}
 }

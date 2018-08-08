@@ -38,11 +38,6 @@ import com.darwino.domino.napi.wrap.design.NSFViewFormat;
  */
 // TODO decide whether these semantics are wise (being passed a note ID, the FetchCollectionData bit, the way ViewEntryCollections work)
 public class NSFView extends NSFDesignNoteBase {
-	private short hCollection = -1;
-	
-	private long collectionDataHandle;
-	private COLLECTIONDATA collectionData;
-	
 	/* this is stored as a byte in order to account for the "not yet determined" state */
 	private byte folder = -1;
 	
@@ -288,42 +283,57 @@ public class NSFView extends NSFDesignNoteBase {
 		return keyArray;
 	}
 	
-	
-	@Override
-	protected void doFree() {
-		try {
-			if(hCollection > 0) {
-				api.NIFCloseCollection(hCollection);
-				hCollection = 0;
-			}
-			if(collectionData != null) {
-				collectionData.free();
-				collectionData = null;
-				api.OSUnlockObject(collectionDataHandle);
-				api.OSMemFree(collectionDataHandle);
-			}
-			
-			super.doFree();
-		} catch(DominoException e) {
-			// This should be very unlikely
-			throw new RuntimeException(e);
+	static class ViewRecycler extends Recycler {
+		private final DominoAPI api;
+		Short hCollection = null;
+		long collectionDataHandle;
+		COLLECTIONDATA collectionData;
+		
+		public ViewRecycler(DominoAPI api) {
+			this.api = api;
 		}
+		
+		boolean hasCollection() {
+			return hCollection != null && hCollection != 0;
+		}
+		
+		@Override
+		void doFree() {
+			try {
+				if(hasCollection()) {
+					api.NIFCloseCollection(hCollection);
+					hCollection = null;
+				}
+				if(collectionData != null) {
+					collectionData.free();
+					collectionData = null;
+					api.OSUnlockObject(collectionDataHandle);
+					api.OSMemFree(collectionDataHandle);
+				}
+			} catch(DominoException e) {
+				
+			}
+		}
+	}
+	@Override
+	protected Recycler createRecycler() {
+		return new ViewRecycler(api);
 	}
 
 	
 	public COLLECTIONDATA getCollectionData() throws DominoException {
 		_checkRefValidity();
 		
-		if(this.collectionData == null && this.hCollection != 0) {
+		if(((ViewRecycler)recycler).collectionData == null && ((ViewRecycler)recycler).hasCollection()) {
 			short hCollection = this.getCollection();
-			collectionDataHandle = api.NIFGetCollectionData(hCollection);
-			if(collectionDataHandle == DominoAPI.NULLHANDLE) {
+			((ViewRecycler)recycler).collectionDataHandle = api.NIFGetCollectionData(hCollection);
+			if(((ViewRecycler)recycler).collectionDataHandle == DominoAPI.NULLHANDLE) {
 				throw new DominoException(null, "Received NULLHANDLE from NIFGetCollectionData");
 			}
-			long dataPtr = api.OSLockObject(collectionDataHandle);
-			collectionData = new COLLECTIONDATA(dataPtr);
+			long dataPtr = api.OSLockObject(((ViewRecycler)recycler).collectionDataHandle);
+			((ViewRecycler)recycler).collectionData = new COLLECTIONDATA(dataPtr);
 		}
-		return this.collectionData;
+		return ((ViewRecycler)recycler).collectionData;
 	}
 	
 	/**
@@ -333,8 +343,8 @@ public class NSFView extends NSFDesignNoteBase {
 	public void refresh() throws DominoException {
 		_checkRefValidity();
 		
-		if(hCollection > 0) {
-			api.NIFUpdateCollection(hCollection);
+		if(((ViewRecycler)recycler).hasCollection()) {
+			api.NIFUpdateCollection(((ViewRecycler)recycler).hCollection);
 		}
 	}
 	
@@ -383,7 +393,8 @@ public class NSFView extends NSFDesignNoteBase {
 	 */
 	@Override
 	public boolean isRefValid() {
-		return super.isRefValid() && hCollection != 0;
+		Short hCollection = ((ViewRecycler)recycler).hCollection;
+		return super.isRefValid() && (hCollection == null || hCollection != 0);
 	}
 	
 	// ******************************************************************************
@@ -391,12 +402,12 @@ public class NSFView extends NSFDesignNoteBase {
 	// ******************************************************************************
 	
 	private short getCollection() throws DominoException {
-		if(this.hCollection == -1) {
+		if(((ViewRecycler)recycler).hCollection == null) {
 			_checkRefValidity();
 			
 			long hNamesList = getParent().getParent().getNamesListHandle();
 			if(hNamesList == 0) {
-				this.hCollection = api.NIFOpenCollection(
+				((ViewRecycler)recycler).hCollection = api.NIFOpenCollection(
 						getParent().getHandle(),
 						getParent().getHandle(),
 						getNoteID(),
@@ -408,7 +419,7 @@ public class NSFView extends NSFDesignNoteBase {
 						NULLHANDLE
 				);
 			} else {
-				this.hCollection = api.NIFOpenCollectionWithUserNameList(
+				((ViewRecycler)recycler).hCollection = api.NIFOpenCollectionWithUserNameList(
 						getParent().getHandle(),
 						getParent().getHandle(),
 						getNoteID(),
@@ -421,10 +432,10 @@ public class NSFView extends NSFDesignNoteBase {
 						hNamesList
 				);
 			}
-			if(this.hCollection == 0) {
+			if(((ViewRecycler)recycler).hCollection == 0) {
 				throw new DominoException(null, "NIFOpenCollection returned NULLHANDLE"); //$NON-NLS-1$
 			}
 		}
-		return this.hCollection;
+		return ((ViewRecycler)recycler).hCollection;
 	}
 }

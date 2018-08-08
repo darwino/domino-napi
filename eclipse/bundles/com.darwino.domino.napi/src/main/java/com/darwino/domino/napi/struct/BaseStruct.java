@@ -23,7 +23,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import com.darwino.domino.napi.c.C;
-import com.darwino.domino.napi.runtime.Freeable;
+import com.darwino.domino.napi.runtime.IdentifiableFreeable;
+import com.darwino.domino.napi.runtime.StructReferenceCache;
 
 
 
@@ -33,7 +34,7 @@ import com.darwino.domino.napi.runtime.Freeable;
  * 
  * @author priand
  */
-public abstract class BaseStruct implements Freeable {
+public abstract class BaseStruct implements IdentifiableFreeable {
 
 	static {
 		initNative();
@@ -84,6 +85,10 @@ public abstract class BaseStruct implements Freeable {
         		trackedInSet = true;
         	}
         }
+        
+        if(owned) {
+        	StructReferenceCache.get().register(this);
+        }
     }
     
     // This should be removed in production to use the garbage explorer
@@ -109,7 +114,7 @@ public abstract class BaseStruct implements Freeable {
     @Override
 	public final void free(boolean force) {
 		if(data!=0 && (force||owned)) {
-            C.free(data);
+            //C.free(data);
             data = 0;
             if(trackedInSet && owned) {
             	ALLOCATED_SET.remove(this);
@@ -124,6 +129,11 @@ public abstract class BaseStruct implements Freeable {
 
     public final long getDataPtr() {
         return data;
+    }
+    
+    @Override
+    public long getBackendIdentifier() {
+    	return getDataPtr();
     }
     
     public void setDataPtr(long data) {

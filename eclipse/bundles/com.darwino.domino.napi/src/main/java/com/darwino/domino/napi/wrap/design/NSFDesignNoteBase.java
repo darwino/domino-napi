@@ -49,10 +49,7 @@ public abstract class NSFDesignNoteBase extends NSFBase {
 
 	@Override
 	protected void doFree() {
-		if(this.note != null) {
-			this.note.free();
-			this.note = null;
-		}
+		this.note = null;
 		this.noteId = 0;
 	}
 

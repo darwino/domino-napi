@@ -17,6 +17,7 @@ package com.darwino.domino.napi.wrap;
 
 import java.io.File;
 
+import com.darwino.domino.napi.DominoAPI;
 import com.darwino.domino.napi.DominoException;
 
 /**
@@ -54,24 +55,35 @@ public class NSFUserID extends NSFHandle {
 	protected NSFBase getParent() {
 		return getSession();
 	}
-
-	/* (non-Javadoc)
-	 * @see com.darwino.domino.napi.wrap.NSFHandle#doFree()
-	 */
-	@Override
-	protected void doFree() {
-		if(getHandle() != 0) {
-			try {
-				api.SECKFMClose(getHandle(), 0);
-			} catch(DominoException e) {
-				// This should be very unlikely
-				throw new RuntimeException(e);
-			}
-		}
-		if(file != null) {
-			file.delete();
+	
+	static class UserIDRecycler extends Recycler {
+		private final DominoAPI api;
+		private long handle;
+		private File file;
+		
+		public UserIDRecycler(DominoAPI api, long handle, File file) {
+			this.api = api;
+			this.handle = handle;
+			this.file = file;
 		}
 		
-		super.doFree();
+		@Override
+		void doFree() {
+			if(handle != 0) {
+				try {
+					api.SECKFMClose(handle, 0);
+				} catch (DominoException e) {
+				}
+				handle = 0;
+			}
+			if(file != null) {
+				file.delete();
+				file = null;
+			}
+		}
+	}
+	@Override
+	protected Recycler createRecycler() {
+		return new UserIDRecycler(api, getHandle(), file);
 	}
 }

@@ -271,4 +271,10 @@ public class NSFForm extends NSFDesignNoteBase {
 			structs.clear();
 		}
 	}
+	
+	@Override
+	protected Recycler createRecycler() {
+		// NOP
+		return null;
+	}
 }

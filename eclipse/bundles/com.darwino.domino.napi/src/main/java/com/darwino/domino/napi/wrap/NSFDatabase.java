@@ -93,8 +93,30 @@ public class NSFDatabase extends NSFHandle {
 		}
 	}
 	
+	static class DatabaseRecycler extends Recycler {
+		private final DominoAPI api;
+		private long handle;
+		
+		public DatabaseRecycler(DominoAPI api, long handle) {
+			this.api = api;
+			this.handle = handle;
+		}
+
+		@Override
+		void doFree() {
+			if(handle != 0) {
+				try {
+					api.NSFDbClose(handle);
+				} catch(DominoException e) {
+					// This should be very unlikely
+					throw new RuntimeException(e);
+				}
+			}
+		}
+		
+	}
+	
 	private final String serverName;
-	private final boolean destroyOnFree;
 	
 	private List<NSFView> viewCache;
 	private List<NSFView> folderCache;
@@ -111,7 +133,9 @@ public class NSFDatabase extends NSFHandle {
 	public NSFDatabase(NSFSession session, long handle, String serverName, boolean destroyOnFree) {
 		super(session, handle);
 		this.serverName = serverName;
-		this.destroyOnFree = destroyOnFree;
+		if(!destroyOnFree) {
+			recycler.setFreed(true);
+		}
 	}
 	
 	public NSFNote createNote() throws DominoException {
@@ -587,15 +611,12 @@ public class NSFDatabase extends NSFHandle {
 			}
 		}
 		
-		if(this.getHandle() > 0 && destroyOnFree) {
-			try {
-				api.NSFDbClose(this.getHandle());
-			} catch(DominoException e) {
-				// This should be very unlikely
-				throw new RuntimeException(e);
-			}
-		}
 		super.doFree();
+	}
+	
+	@Override
+	protected Recycler createRecycler() {
+		return new DatabaseRecycler(api, getHandle());
 	}
 	
 	@Override

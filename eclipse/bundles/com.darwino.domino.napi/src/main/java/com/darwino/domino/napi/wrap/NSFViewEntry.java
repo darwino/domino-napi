@@ -447,6 +447,11 @@ public class NSFViewEntry extends NSFBase {
 	protected void doFree() {
 		// NOP
 	}
+	@Override
+	protected Recycler createRecycler() {
+		// NOP
+		return null;
+	}
 	
 	protected long _getFinalPointer() {
 		return finalPointer;

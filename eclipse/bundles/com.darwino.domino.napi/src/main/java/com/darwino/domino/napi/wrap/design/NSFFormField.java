@@ -432,29 +432,18 @@ public class NSFFormField extends NSFBase {
 	 */
 	@Override
 	protected void doFree() {
-		cdField.free();
 		cdField = null;
-		
-		if(cdFieldHint != null) {
-			cdFieldHint.free();
-			cdFieldHint = null;
-		}
-		if(cdExtField != null) {
-			cdExtField.free();
-			cdExtField = null;
-		}
-		if(cdDataFlags != null) {
-			cdDataFlags.free();
-			cdDataFlags = null;
-		}
-		if(cdKeyword != null) {
-			cdKeyword.free();
-			cdKeyword = null;
-		}
-		if(cdEmbeddedCtl != null) {
-			cdEmbeddedCtl.free();
-			cdEmbeddedCtl = null;
-		}
+		cdFieldHint = null;
+		cdExtField = null;
+		cdDataFlags = null;
+		cdKeyword = null;
+		cdEmbeddedCtl = null;
+	}
+	
+	@Override
+	protected Recycler createRecycler() {
+		// NOP
+		return null;
 	}
 
 	/* (non-Javadoc)
