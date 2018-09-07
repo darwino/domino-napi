@@ -11,7 +11,7 @@ To do a build for each platform, there are several external dependencies to conf
 * The header files from the "include" folder of the [IBM C API Toolkit for Notes/Domino 9.0.1](https://www.ibm.com/developerworks/develop/collaboration/index.html), placed in the "dependencies/notes" directory in that project
 * CMake, installed from https://cmake.org or via your OS's package manager
 * A compatible C/C++ compiler toolchain:
-    * macOS: XCode
+    * macOS: Xcode
     * Linux: gcc/g++
     * Windows: MSVC 15+
 * Java JDK 6+ and `JAVA_HOME` set
